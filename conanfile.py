@@ -1,4 +1,4 @@
-from conans import ConanFile, MSBuild, tools
+from conans import ConanFile, MSBuild, CMake, tools
 import os
 
 class Sdl2Conan(ConanFile):
@@ -11,8 +11,7 @@ class Sdl2Conan(ConanFile):
     settings = "os", "compiler", "arch"
     options = {"shared": [True, False], "sdl2main": [True,False]}
     default_options = "shared=True", "sdl2main=False"
-
-    exports_sources = ["premake5.lua"]
+    build_requires = "cmake_installer/3.10.0@conan/stable"
 
     SDL2_FOLDER_NAME = "SDL2-%s" % version
 
@@ -40,9 +39,22 @@ class Sdl2Conan(ConanFile):
                 msbuild.build("VisualC/SDL.sln", build_type="Debug")
                 msbuild.build("VisualC/SDL.sln", build_type="Release")
 
-            if self.settings.compiler == "clang":
-                self.run("make config=debug")
-                self.run("make config=release")
+            else:
+                cmake = CMake(self)
+                if cmake.is_multi_configuration:
+                    cmmd = 'cmake "%s" %s' % (self.source_folder, cmake.command_line)
+                    self.run(cmmd)
+                    self.run("cmake --build . --config Debug")
+                    self.run("cmake --build . --config Release")
+
+                else:
+                    for config in ("Debug", "Release"):
+                        self.output.info("Building %s" % config)
+                        self.run('cmake "%s" %s -DCMAKE_BUILD_TYPE=%s'
+                                % (self.source_folder, cmake.command_line, config))
+                        self.run("cmake --build .")
+                        shutil.rmtree("CMakeFiles")
+                        os.remove("CMakeCache.txt")
 
     def package(self):
         # Copy the license file
