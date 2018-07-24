@@ -86,7 +86,9 @@ class Sdl2Conan(ConanFile):
         if self.settings.os == "Windows":
             if self.options.shared:
                 self.copy("*/SDL2.dll", "bin", build_dir, keep_path=True)
-            self.copy("*/SDL2.pdb", "lib", build_dir, keep_path=True)
+                self.copy("*/SDL2.pdb", "bin", build_dir, keep_path=True)
+            else:
+                self.copy("*/SDL2.pdb", "lib", build_dir, keep_path=True)
             self.copy("*/SDL2.lib", "lib", build_dir, keep_path=True)
             self.copy("*/SDL2main.lib", "lib", build_dir, keep_path=True)
 
