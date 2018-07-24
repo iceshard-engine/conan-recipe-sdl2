@@ -45,7 +45,7 @@ class Sdl2Conan(ConanFile):
             else:
                 cmake = CMake(self)
                 if cmake.is_multi_configuration:
-                    cmmd = 'cmake "%s" %s' % (self.SDL2_FOLDER_NAME, cmake.command_line)
+                    cmmd = 'cmake "%s" %s' % (".", cmake.command_line)
                     self.run(cmmd)
                     self.run("cmake --build . --config Debug")
                     self.run("cmake --build . --config Release")
@@ -54,7 +54,7 @@ class Sdl2Conan(ConanFile):
                     for config in ("Debug", "Release"):
                         self.output.info("Building %s" % config)
                         self.run('cmake "%s" %s -DCMAKE_BUILD_TYPE=%s'
-                                % (self.SDL2_FOLDER_NAME, cmake.command_line, config))
+                                % (".", cmake.command_line, config))
                         self.run("cmake --build .")
                         shutil.rmtree("CMakeFiles")
                         os.remove("CMakeCache.txt")
