@@ -43,21 +43,26 @@ class Sdl2Conan(ConanFile):
                 msbuild.build("VisualC/SDL.sln", build_type="Release")
 
             else:
-                cmake = CMake(self)
-                if cmake.is_multi_configuration:
-                    cmmd = 'cmake "%s" %s' % (".", cmake.command_line)
-                    self.run(cmmd)
-                    self.run("cmake --build . --config Debug")
-                    self.run("cmake --build . --config Release")
 
-                else:
-                    for config in ("Debug", "Release"):
-                        self.output.info("Building %s" % config)
-                        self.run('cmake "%s" %s -DCMAKE_BUILD_TYPE=%s'
-                                % (".", cmake.command_line, config))
-                        self.run("cmake --build .")
-                        shutil.rmtree("CMakeFiles")
-                        os.remove("CMakeCache.txt")
+                os.mkdir("build")
+                with tools.chdir("build"):
+
+                    cmake = CMake(self)
+                    if cmake.is_multi_configuration:
+                        cmmd = 'cmake "%s" %s' % ("..", cmake.command_line)
+                        self.run(cmmd)
+                        self.run("cmake --build . --config Debug")
+                        self.run("cmake --build . --config Release")
+
+                    else:
+                        for config in ("Debug", "Release"):
+                            self.output.info("Building %s" % config)
+                            self.run('cmake "%s" %s -DCMAKE_BUILD_TYPE=%s'
+                                    % ("..", cmake.command_line, config))
+                            self.run("cmake --build .")
+                            shutil.rmtree("CMakeFiles")
+                            os.remove("CMakeCache.txt")
+
 
     def package(self):
         # Copy the license file
