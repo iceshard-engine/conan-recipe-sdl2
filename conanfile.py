@@ -11,9 +11,12 @@ class Sdl2Conan(ConanFile):
     settings = "os", "compiler", "arch"
     options = {"shared": [True, False], "sdl2main": [True,False]}
     default_options = "shared=True", "sdl2main=False"
-    build_requires = "cmake_installer/3.10.0@conan/stable"
 
     SDL2_FOLDER_NAME = "SDL2-%s" % version
+
+    def build_requirements(self):
+        if self.settings.os == "Linux":
+            self.build_requires("cmake_installer/3.10.0@conan/stable")
 
     def package_id(self):
         self.info.options.sdl2main = "Any"
@@ -42,7 +45,7 @@ class Sdl2Conan(ConanFile):
             else:
                 cmake = CMake(self)
                 if cmake.is_multi_configuration:
-                    cmmd = 'cmake "%s" %s' % (self.source_folder, cmake.command_line)
+                    cmmd = 'cmake "%s" %s' % (".", cmake.command_line)
                     self.run(cmmd)
                     self.run("cmake --build . --config Debug")
                     self.run("cmake --build . --config Release")
