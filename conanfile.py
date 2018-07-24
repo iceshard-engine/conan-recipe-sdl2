@@ -1,4 +1,5 @@
 from conans import ConanFile, MSBuild, CMake, tools
+import shutil
 import os
 
 class Sdl2Conan(ConanFile):
