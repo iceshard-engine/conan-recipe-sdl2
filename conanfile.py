@@ -102,11 +102,13 @@ class Sdl2Conan(ConanFile):
         self.cpp_info.includedirs = ["include"]
 
         self.cpp_info.debug.libdirs = [ "lib/Debug" ]
-        self.cpp_info.debug.bindirs = [ "bin/Debug" ]
         self.cpp_info.release.libdirs = [ "lib/Release" ]
-        self.cpp_info.release.bindirs = [ "bin/Release" ]
         self.cpp_info.libdirs = []
-        self.cpp_info.bindirs = []
+
+        if self.options.shared:
+            self.cpp_info.debug.bindirs = [ "bin/Debug" ]
+            self.cpp_info.release.bindirs = [ "bin/Release" ]
+            self.cpp_info.bindirs = []
 
         if self.options.sdl2main == True:
             self.cpp_info.libs = ["SDL2", "SDL2main"]
