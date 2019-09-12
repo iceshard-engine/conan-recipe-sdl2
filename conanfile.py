@@ -3,7 +3,7 @@ import shutil
 import os
 
 class Sdl2Conan(ConanFile):
-    name = "sdl2"
+    name = "SDL2"
     version = "2.0.8"
     license = "MIT"
     description = "SDL2 conan package"
@@ -11,9 +11,9 @@ class Sdl2Conan(ConanFile):
 
     settings = "os", "compiler", "arch"
     options = {"shared": [True, False], "sdl2main": [True,False]}
-    default_options = "shared=True", "sdl2main=False"
+    default_options = {"shared":True, "sdl2main":False}
 
-    SDL2_FOLDER_NAME = "SDL2-%s" % version
+    SDL2_FOLDER_NAME = "SDL2-{}".format(version)
 
     def build_requirements(self):
         if self.settings.os == "Linux":
@@ -29,8 +29,8 @@ class Sdl2Conan(ConanFile):
 
     # The the source from github
     def source(self):
-        zip_name = "SDL2-%s.tar.gz" % self.version
-        tools.download("https://www.libsdl.org/release/%s" % zip_name, zip_name)
+        zip_name = "SDL2-{}.tar.gz".format(self.version)
+        tools.download("https://www.libsdl.org/release/{}".format(zip_name), zip_name)
         tools.unzip(zip_name)
         os.unlink(zip_name)
 
@@ -50,16 +50,15 @@ class Sdl2Conan(ConanFile):
 
                     cmake = CMake(self)
                     if cmake.is_multi_configuration:
-                        cmmd = 'cmake "%s" %s' % ("..", cmake.command_line)
+                        cmmd = 'cmake ".." {}'.format(cmake.command_line)
                         self.run(cmmd)
                         self.run("cmake --build . --config Debug")
                         self.run("cmake --build . --config Release")
 
                     else:
                         for config in ("Debug", "Release"):
-                            self.output.info("Building %s" % config)
-                            self.run('cmake "%s" %s -DCMAKE_BUILD_TYPE=%s'
-                                    % ("..", cmake.command_line, config))
+                            self.output.info("Building {}".format(config))
+                            self.run("cmake .. {} -DCMAKE_BUILD_TYPE={}".format(cmake.command_line, config))
                             self.run("cmake --build .")
                             shutil.rmtree("CMakeFiles")
                             os.remove("CMakeCache.txt")
@@ -69,7 +68,7 @@ class Sdl2Conan(ConanFile):
         # Copy the license file
         self.copy("COPYING.txt", src=self.SDL2_FOLDER_NAME, dst="LICENSE")
 
-        self.copy("*.h", "include", "%s/include" % self.SDL2_FOLDER_NAME, keep_path=False)
+        self.copy("*.h", "include", "{}/include".format(self.SDL2_FOLDER_NAME), keep_path=False)
 
         # Calculate the build directory
         build_dir = self.SDL2_FOLDER_NAME
