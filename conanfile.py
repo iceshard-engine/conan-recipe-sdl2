@@ -4,7 +4,7 @@ import os
 
 class Sdl2Conan(ConanFile):
     name = "SDL2"
-    version = "2.0.8"
+    version = "2.0.9"
     license = "MIT"
     description = "SDL2 conan package"
     url = "https://www.libsdl.org/index.php"
