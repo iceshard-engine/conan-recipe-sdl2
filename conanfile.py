@@ -2,76 +2,53 @@ from conans import ConanFile, MSBuild, CMake, tools
 import shutil
 import os
 
-class Sdl2Conan(ConanFile):
+class SDL2Conan(ConanFile):
     name = "SDL2"
-    version = "2.0.9"
     license = "MIT"
-    description = "SDL2 conan package"
     url = "https://www.libsdl.org/index.php"
+    description = "Conan recipe for the SDL2 library."
 
+    # Settings and options
     settings = "os", "compiler", "arch"
-    options = {"shared": [True, False], "sdl2main": [True,False]}
-    default_options = {"shared":True, "sdl2main":False}
 
-    SDL2_FOLDER_NAME = "SDL2-{}".format(version)
+    options = {
+        "shared": [True, False],
+        "sdl2main": [True, False]
+    }
+    default_options = {
+        "shared": True,
+        "sdl2main": False
+    }
 
-    def build_requirements(self):
-        if self.settings.os == "Linux":
-            self.build_requires("cmake_installer/3.10.0@conan/stable")
+    # Iceshard conan tools
+    python_requires = "iceshard-conan-tools/0.1@iceshard/stable"
+    python_requires_extend = "iceshard-conan-tools.IceTools"
 
+    # Initialize the package
+    def init(self):
+        self.ice_init("cmake")
+        self.build_requires = self._ice.build_requires
+
+    # Update the package id
     def package_id(self):
         self.info.options.sdl2main = "Any"
 
-    # We dont want the runtime setting for VS projects.
-    def configure(self):
-        if self.settings.compiler == "Visual Studio":
-            del self.settings.compiler.runtime
-
-    # The the source from github
-    def source(self):
-        zip_name = "SDL2-{}.tar.gz".format(self.version)
-        tools.download("https://www.libsdl.org/release/{}".format(zip_name), zip_name)
-        tools.unzip(zip_name)
-        os.unlink(zip_name)
-
     # Build both the debug and release builds
-    def build(self):
-        with tools.chdir(os.path.join(self.source_folder, self.SDL2_FOLDER_NAME)):
+    def ice_build(self):
+        if self.settings.compiler == "Visual Studio":
+            self.ice_build_msbuild("VisualC/SDL.sln", ["Debug", "Release"])
 
-            if self.settings.compiler == "Visual Studio":
-                msbuild = MSBuild(self)
-                msbuild.build("VisualC/SDL.sln", build_type="Debug")
-                msbuild.build("VisualC/SDL.sln", build_type="Release")
-
-            else:
-
-                os.mkdir("build")
-                with tools.chdir("build"):
-
-                    cmake = CMake(self)
-                    if cmake.is_multi_configuration:
-                        cmmd = 'cmake ".." {}'.format(cmake.command_line)
-                        self.run(cmmd)
-                        self.run("cmake --build . --config Debug")
-                        self.run("cmake --build . --config Release")
-
-                    else:
-                        for config in ("Debug", "Release"):
-                            self.output.info("Building {}".format(config))
-                            self.run("cmake .. {} -DCMAKE_BUILD_TYPE={}".format(cmake.command_line, config))
-                            self.run("cmake --build .")
-                            shutil.rmtree("CMakeFiles")
-                            os.remove("CMakeCache.txt")
-
+        else:
+            self.ice_build_cmake(["Debug", "Release"])
 
     def package(self):
         # Copy the license file
-        self.copy("COPYING.txt", src=self.SDL2_FOLDER_NAME, dst="LICENSE")
+        self.copy("COPYING.txt", src=self._ice.source_dir, dst="LICENSE")
 
-        self.copy("*.h", "include", "{}/include".format(self.SDL2_FOLDER_NAME), keep_path=False)
+        self.copy("*.h", "include", "{}/include".format(self._ice.source_dir), keep_path=False)
 
         # Calculate the build directory
-        build_dir = self.SDL2_FOLDER_NAME
+        build_dir = self._ice.source_dir
 
         # Build dir on msvc
         if self.settings.compiler == "Visual Studio":
