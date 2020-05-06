@@ -9,7 +9,7 @@ jobs:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     env:
-      PATH: /home/runner/.local/bin:$PATH
+      PATH: ${{ /home/runner/.local/bin:$PATH }}
     steps:
     - uses: actions/checkout@v1
     - name: Setup build tools (Ubuntu)
