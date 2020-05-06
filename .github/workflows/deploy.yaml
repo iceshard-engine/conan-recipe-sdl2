@@ -14,7 +14,7 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: |
         pip3 install wheel
-        sudo pip3 install conan
+        pip3 install conan
         conan remote add conan-iceshard https://conan.iceshard.net/
         conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
     - name: Setup build tools (Windows)
