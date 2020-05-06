@@ -10,7 +10,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v1
-    - name: Setup repository
+    - name: Setup build tools (Ubuntu)
+      if: ${{ runner.os == Linux }}
+      run: |
+        pip install wheel
+    - name: Setup build tools
       run: |
         pip install conan
         conan remote add conan-iceshard https://conan.iceshard.net/
