@@ -16,7 +16,7 @@ jobs:
         pip install wheel
     - name: Setup build tools
       run: |
-        pip install conan
+        pip install --user conan
         conan remote add conan-iceshard https://conan.iceshard.net/
         conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
     - name: Build
