@@ -13,6 +13,7 @@ jobs:
     - name: Setup build tools (Ubuntu)
       if: ${{ runner.os == 'Linux' }}
       run: |
+        set PATH=/home/runner/.local/bin;$PATH
         python3 -m pip install --upgrade pip setuptools wheel
         pip3 install conan
         conan remote add conan-iceshard https://conan.iceshard.net/
