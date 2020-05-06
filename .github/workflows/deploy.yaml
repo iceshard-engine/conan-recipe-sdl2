@@ -8,8 +8,6 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    env:
-      PATH: ${{ /home/runner/.local/bin:$PATH }}
     steps:
     - uses: actions/checkout@v1
     - name: Setup build tools (Ubuntu)
@@ -26,7 +24,13 @@ jobs:
         pip install conan
         conan remote add conan-iceshard https://conan.iceshard.net/
         conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-    - name: Build
+    - name: Build (Ubuntu)
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        export PATH=/home/runner/.local/bin:$PATH
+        conan create . SDL2/2.0.12@iceshard/stable
+    - name: Build (Windows)
+      if: ${{ runner.os == 'Windows' }}
       run: |
         conan create . SDL2/2.0.12@iceshard/stable
     - name: Deploy
