@@ -1,36 +1,21 @@
 name: Deploy
 
-on: 'push'
+on:
+  push:
+    tags:
+    - v*
 
 jobs:
   deploy-build:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Setup build tools (Ubuntu)
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        export PATH=/home/runner/.local/bin:$PATH
-        python3 -m pip install --upgrade pip setuptools wheel
-        pip3 install conan
-        conan remote add conan-iceshard https://conan.iceshard.net/
-        conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-    - name: Setup build tools (Windows)
-      if: ${{ runner.os == 'Windows' }}
+    - name: Setup repository
       run: |
         pip install conan
         conan remote add conan-iceshard https://conan.iceshard.net/
         conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-    - name: Build (Ubuntu)
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        export PATH=/home/runner/.local/bin:$PATH
-        conan create . SDL2/2.0.12@iceshard/stable
-    - name: Build (Windows)
-      if: ${{ runner.os == 'Windows' }}
+    - name: Build
       run: |
         conan create . SDL2/2.0.12@iceshard/stable
     - name: Deploy
