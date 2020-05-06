@@ -13,6 +13,7 @@ jobs:
     - name: Setup build tools (Ubuntu)
       if: ${{ runner.os == 'Linux' }}
       run: |
+        python3 -m pip install --upgrade pip setuptools wheel
         pip3 install conan
         conan remote add conan-iceshard https://conan.iceshard.net/
         conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
