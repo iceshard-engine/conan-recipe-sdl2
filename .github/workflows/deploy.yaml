@@ -6,7 +6,8 @@ on:
     - v*
 
 jobs:
-  deploy-build:
+  deploy-build-windows:
+    name: Deploy (Windows)
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
@@ -22,3 +23,23 @@ jobs:
       run: |
         conan user iceshard -r conan-iceshard -p ${{ secrets.CONAN_PASSWORD }}
         conan upload -r conan-iceshard SDL2/2.0.12@iceshard/stable --all
+  deploy-build-linux:
+    runs-on: ubuntu-latest
+    name: Deploy (Ubuntu)
+    env:
+      conan: /home/runner/.local/bin/conan
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup repository
+      run: |
+        python3 -m pip install --upgrade pip setuptools wheel
+        pip3 install conan
+        $conan remote add conan-iceshard https://conan.iceshard.net/
+        $conan remote add conan-bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+    - name: Build
+      run: |
+        $conan create . SDL2/2.0.12@iceshard/stable
+    - name: Deploy
+      run: |
+        $conan user iceshard -r conan-iceshard -p ${{ secrets.CONAN_PASSWORD }}
+        $conan upload -r conan-iceshard SDL2/2.0.12@iceshard/stable --all

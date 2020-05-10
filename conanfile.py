@@ -21,8 +21,8 @@ class SDL2Conan(ConanFile):
     }
 
     # Iceshard conan tools
-    python_requires = "iceshard-conan-tools/0.1@iceshard/stable"
-    python_requires_extend = "iceshard-conan-tools.IceTools"
+    python_requires = "conan-iceshard-tools/0.3@iceshard/stable"
+    python_requires_extend = "conan-iceshard-tools.IceTools"
 
     # Initialize the package
     def init(self):
