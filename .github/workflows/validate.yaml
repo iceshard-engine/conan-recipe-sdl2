@@ -1,10 +1,10 @@
-name: Deploy
+name: Validate
 
 on: 'push'
 
 jobs:
-  deploy-build-windows:
-    name: Deploy (Windows)
+  validate-build-windows:
+    name: Validate (Windows)
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
@@ -17,9 +17,9 @@ jobs:
       run: |
         conan create . SDL2/2.0.12@iceshard/stable
 
-  deploy-build-linux:
+  validate-build-linux:
     runs-on: ubuntu-latest
-    name: Deploy (Ubuntu)
+    name: Validate (Ubuntu)
     env:
       conan: /home/runner/.local/bin/conan
     steps:
